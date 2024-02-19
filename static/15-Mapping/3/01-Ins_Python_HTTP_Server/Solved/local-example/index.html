@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Miles for New Cars</title>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+
+</head>
+<body>
+  <div id="plot"></div>
+  <script>
+    d3.json("data/data.json").then((data) => {
+      //  Create the Traces
+      let trace1 = {
+        x: data.new_cars,
+        y: data.miles,
+        type: "box",
+        name: "Miles on New Cars",
+        boxpoints: "all"
+      };
+
+      // Create the data array for the plot.
+      let plotData = [trace1];
+
+      // Define the plot layout.
+      let layout = {
+        title: "Miles for New Cars",
+        xaxis: { title: "New Cars" },
+        yaxis: { title: "Square Root of Miles" }
+      };
+
+      // Plot the chart to a div tag with an ID of "plot".
+      Plotly.newPlot("plot", plotData, layout);
+    });
+  </script>
+</body>
+</html>
