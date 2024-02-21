@@ -1,53 +1,4 @@
-// Store our API endpoint as queryUrl.
-var queryUrl = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson";
-
-// Perform a GET request to the query URL.
-d3.json(queryUrl).then(function (data) {
-    // Once we get a response, send the data.features object to the createFeatures function.
-    createFeatures(data.features);
-});
-
-function createFeatures(earthquakeData) {
-    // Define a function that we want to run once for each feature in the features array.
-    // Give each feature a popup that describes the place and mag of the earthquake.
-    function onEachFeature(feature, layer) {
-        layer.bindPopup(`<h3>${feature.properties.mag}</h3><hr><p>${new Date(feature.properties.place)}</p>`);
-    }
-
-    // Function to determine marker size based on earthquake magnitude
-    function getMarkerSize(mag) {
-        return mag * 5;
-    }
-
-    // Function to determine marker color based on earthquake depth
-    function getMarkerColor(depth) {
-        if (depth <= 10) return "#00ff00";
-        else if (depth > 10 && depth <= 30) return "#adff2f";
-        else if (depth > 30 && depth <= 50) return "#556b2f";
-        else if (depth > 50 && depth <= 70) return "#ffa500";
-        else if (depth > 70 && depth <= 90) return "#0000ff";
-        else if (depth > 90) return "#ff69b4";
-        else return "#ffffff";
-    }
-    // Create a GeoJSON layer that contains the features array on the earthquakeData object.
-    // Run the onEachFeature function once for each piece of data in the array.
-    let earthquakes = L.geoJSON(earthquakeData, {
-        onEachFeature: onEachFeature,
-        pointToLayer: function (feature, latlng) {
-            return L.circleMarker(latlng, {
-                radius: getMarkerSize(feature.properties.mag),
-                fillColor: getMarkerColor(feature.geometry.coordinates[2]),
-                color: '#000',
-                weight: 1,
-                opacity: 1,
-                fillOpacity: 0.8
-            });
-        }
-    });
-
-    // Send our earthquakes layer to the createMap function.
-    createMap(earthquakes);
-}
+//Section 1: Creating the Map
 
 function createMap(earthquakes) {
     // Set Tile layers (Background map images).
@@ -95,7 +46,7 @@ function createMap(earthquakes) {
 
     legend.onAdd = function () {
         var div = L.DomUtil.create('div', 'info legend'),
-            grades = [0, 10, 30, 50, 70, 90, 1000],
+            grades = [0, 10, 30, 50, 70, 90],
             labels = ["0-10", "10-30", "30-50", "50-70", "70-90", "90+"];
 
         // loop through our density intervals and generate a label with a colored square for each interval
@@ -109,3 +60,58 @@ function createMap(earthquakes) {
 
     legend.addTo(myMap);
 }
+
+
+//Section 2 Connecting the API
+
+// Store our API endpoint as queryUrl.
+var queryUrl = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson";
+
+// Perform a GET request to the query URL.
+d3.json(queryUrl).then(function (data) {
+    // Once we get a response, send the data.features object to the createFeatures function.
+    createFeatures(data.features);
+});
+
+function createFeatures(earthquakeData) {
+    // Define a function that we want to run once for each feature in the features array.
+    // Give each feature a popup that describes the place and mag (magnitude) of the earthquake.
+    function onEachFeature(feature, layer) {
+        layer.bindPopup(`<h3>${feature.properties.mag}</h3><hr><p>${(feature.properties.place)}</p>`);
+    }
+
+    // Function to determine marker size based on earthquake magnitude
+    function getMarkerSize(mag) {
+        return mag * 5;
+    }
+
+    // Function to determine marker color based on earthquake depth
+    function getMarkerColor(depth) {
+        if (depth <= 10) return "#00ff00"; //green
+        else if (depth > 10 && depth <= 30) return "#adff2f"; //yellowgreen
+        else if (depth > 30 && depth <= 50) return "#556b2f"; //darkolivegreen
+        else if (depth > 50 && depth <= 70) return "#ffa500"; //orange
+        else if (depth > 70 && depth <= 90) return "#0000ff"; //blue
+        else if (depth > 90) return "#ff69b4"; //pink
+        else return "#ffffff";//white
+    }
+    // Create a GeoJSON layer that contains the features array on the earthquakeData object.
+    // Run the onEachFeature function once for each piece of data in the array.
+    let earthquakes = L.geoJSON(earthquakeData, {
+        onEachFeature: onEachFeature,
+        pointToLayer: function (feature, latlng) {
+            return L.circleMarker(latlng, {
+                radius: getMarkerSize(feature.properties.mag),
+                fillColor: getMarkerColor(feature.geometry.coordinates[2]),
+                color: '#000',
+                weight: 1,
+                opacity: 1,
+                fillOpacity: 0.8
+            });
+        }
+    });
+
+    // Send our earthquakes layer to the createMap function.
+    createMap(earthquakes);
+}
+
